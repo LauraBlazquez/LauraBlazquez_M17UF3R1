@@ -11,7 +11,7 @@ public class DoorManager : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            transform.eulerAngles = Vector3.Lerp(closedPos, openedPos, 1f);
+            transform.GetChild(0).localRotation = Quaternion.Euler(openedPos);
         }
     }
 
@@ -19,7 +19,7 @@ public class DoorManager : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            transform.eulerAngles = Vector3.Lerp(openedPos, closedPos, 1f);
+            transform.GetChild(0).localRotation = Quaternion.Euler(closedPos);
         }
     }
 
