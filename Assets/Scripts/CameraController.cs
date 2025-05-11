@@ -6,6 +6,7 @@ public class CameraController : MonoBehaviour
 {
     public Transform thirdPersonPivot;
     public Transform firstPersonPivot;
+    public Transform dancePivot;
     public Transform playerBody;
     public float cameraSpeed = 3f;
     public float mouseSensitivity = 0.3f;
@@ -13,14 +14,14 @@ public class CameraController : MonoBehaviour
     public float maxY = 90f;
     public Player player;
     public float danceAnimationDuration = 3f;
+    public List<GameObject> itemsToHide = new List<GameObject>();
 
     private PlayerControlls controls;
     private bool isAiming;
+    private bool isDancing;
     private Vector2 lookInput;
     private float xRotation = 0f;
     private Transform currentTarget;
-    private bool isDancing;
-    public List<GameObject> itemsToHide = new List<GameObject>();
 
     private void Awake()
     {
@@ -36,7 +37,6 @@ public class CameraController : MonoBehaviour
     {
         controls.Gameplay.Enable();
         controls.Camera.Enable();
-        controls.Gameplay.Dance.performed -= ctx => Dance();
     }
 
     private void OnDisable()
@@ -61,9 +61,9 @@ public class CameraController : MonoBehaviour
         if (!isDancing)
         {
             currentTarget = isAiming ? firstPersonPivot : thirdPersonPivot;
-            transform.position = Vector3.Lerp(transform.position, currentTarget.position, Time.deltaTime * cameraSpeed);
-            transform.rotation = Quaternion.Lerp(transform.rotation, currentTarget.rotation, Time.deltaTime * cameraSpeed);
         }
+        transform.position = Vector3.Lerp(transform.position, currentTarget.position, Time.deltaTime * cameraSpeed);
+        transform.rotation = Quaternion.Lerp(transform.rotation, currentTarget.rotation, Time.deltaTime * cameraSpeed);
     }
 
     private void Update()
@@ -95,10 +95,7 @@ public class CameraController : MonoBehaviour
     private IEnumerator DanceRoutine()
     {
         isDancing = true;
-        Vector3 frontPosition = playerBody.position + playerBody.forward * 9f + Vector3.up * 4f;
-        Quaternion lookAtPlayer = Quaternion.LookRotation(playerBody.position + Vector3.up * 4f - frontPosition);
-        transform.position = frontPosition;
-        transform.rotation = lookAtPlayer;
+        currentTarget = dancePivot;
         yield return new WaitForSeconds(danceAnimationDuration);
         isDancing = false;
         foreach (GameObject item in itemsToHide)

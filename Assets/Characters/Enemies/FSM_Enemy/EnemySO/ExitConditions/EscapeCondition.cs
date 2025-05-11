@@ -5,11 +5,11 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "EscapeCondition", menuName = "EnemyConditionSO/Escape")]
 public class EscapeCondition : EnemyConditionSO
 {
-    public override bool CheckCondition(EnemyController ec)
+    public override bool CheckCondition(Enemy e)
     {
-        if (ec.HP <= 50)
+        if (e.health <= 50)
         {
-            return ec.escape == true;
+            return e.escape == true;
         }
         return false;
     }

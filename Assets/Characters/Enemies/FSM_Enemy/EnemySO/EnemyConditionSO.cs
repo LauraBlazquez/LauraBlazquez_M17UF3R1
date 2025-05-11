@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 public abstract class EnemyConditionSO : ScriptableObject
 {
-    public abstract bool CheckCondition(EnemyController ec);
-
-    public bool answer;
+    public bool answer = true;
+    public abstract bool CheckCondition(Enemy e);
 }

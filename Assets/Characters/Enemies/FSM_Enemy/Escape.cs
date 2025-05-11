@@ -4,18 +4,21 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Escape", menuName = "StatesSO/Escape")]
 public class Escape : EnemyStateSO
 {
-    public override void OnStateEnter(EnemyController ec)
-    {
+    public float escapeSpeed = 4f;
+    public float escapeDistance = 10f;
 
+    public override void OnStateEnter(Enemy e)
+    {
+        e.Pathfinding.Escape();
     }
 
-    public override void OnStateExit(EnemyController ec)
+    public override void OnStateUpdate(Enemy e)
     {
-        ec.gameObject.GetComponent<EnemyPathFinding>().StopEscape();
+        e.Pathfinding.ContinueMove(escapeSpeed);
     }
 
-    public override void OnStateUpdate(EnemyController ec)
+    public override void OnStateExit(Enemy e)
     {
-        ec.gameObject.GetComponent<EnemyPathFinding>().Escape();
+        e.Pathfinding.StopEscape();
     }
 }

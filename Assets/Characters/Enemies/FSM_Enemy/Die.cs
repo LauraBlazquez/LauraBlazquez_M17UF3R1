@@ -4,18 +4,17 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Die", menuName = "StatesSO/Die")]
 public class Die : EnemyStateSO
 {
-    public override void OnStateEnter(EnemyController ec)
+    public override void OnStateEnter(Enemy e)
     {
-        GameObject.Destroy(ec.gameObject);
-        Debug.Log("allahu akbar");
+        e.Die();
     }
 
-    public override void OnStateExit(EnemyController ec)
+    public override void OnStateUpdate(Enemy e)
     {
 
     }
 
-    public override void OnStateUpdate(EnemyController ec)
+    public override void OnStateExit(Enemy e)
     {
 
     }

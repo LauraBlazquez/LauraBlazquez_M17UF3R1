@@ -5,8 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "DieCondition", menuName = "EnemyConditionSO/Die")]
 public class DieCondition : EnemyConditionSO
 {
-    public override bool CheckCondition(EnemyController ec)
+    public override bool CheckCondition(Enemy e)
     {
-        return ec.HP <= 0;
+        return e.health <= 0;
     }
 }

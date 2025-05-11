@@ -5,8 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ChaseCondition", menuName = "EnemyConditionSO/Chase")]
 public class ChaseCondition : EnemyConditionSO
 {
-    public override bool CheckCondition(EnemyController ec)
+    public override bool CheckCondition(Enemy e)
     {
-        return ec.OnVisionRange;
+        return e.OnVisionRange;
     }
 }

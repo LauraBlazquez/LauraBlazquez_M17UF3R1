@@ -7,63 +7,77 @@ using UnityEngine.UI;
 public class EnemyPathFinding : MonoBehaviour
 {
     public NavMeshAgent agent;
-    public GameObject Apoint, Bpoint;
     public GameObject target;
-    public GameObject destination;
+    public float patrolRadius = 10f;
+    public float escapeDistance = 10f;
     public bool patrullanding = true;
-    public float lastTargetRadius = 1f;
 
-    // Start is called before the first frame update
     void Start()
     {
-        destination = Bpoint;   
-        Patrol();
+        StartPatrol();
     }
 
-    public void Patrol()
+    public void StartPatrol()
     {
-        while (patrullanding)
+        patrullanding = true;
+        GoToRandomPoint();
+    }
+
+    public void ContinuePatrol()
+    {
+        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
-            agent.SetDestination(destination.transform.position);
-            while (agent.pathPending || agent.remainingDistance > agent.stoppingDistance)
-            {
-                return;
-            }
-            destination = destination == Apoint ? Bpoint : Apoint;
+            GoToRandomPoint();
         }
     }
+
+    public void StopPatrol()
+    {
+        patrullanding = false;
+        agent.ResetPath();
+    }
+
+    private void GoToRandomPoint()
+    {
+        Vector3 randomDirection = Random.insideUnitSphere * patrolRadius;
+        randomDirection += transform.position;
+        if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, patrolRadius, NavMesh.AllAreas))
+        {
+            agent.SetDestination(hit.position);
+        }
+    }
+
     public void Chase()
     {
-        agent.SetDestination(target.transform.position);
+        if (target != null)
+        {
+            agent.SetDestination(target.transform.position);
+        }
     }
 
     public void StopChase()
     {
-        return;
-    }
-
-    public void StopEscape()
-    {
-        return;
+        agent.ResetPath();
     }
 
     public void Escape()
     {
+        if (target == null) return;
         Vector3 directionAway = (transform.position - target.transform.position).normalized;
-        float fleeDistance = 10f;
-        Vector3 newTargetPosition = transform.position + (directionAway * fleeDistance);
-        agent.SetDestination(newTargetPosition);
+        Vector3 escapePoint = transform.position + directionAway * escapeDistance;
+        if (NavMesh.SamplePosition(escapePoint, out NavMeshHit hit, 5f, NavMesh.AllAreas))
+        {
+            agent.SetDestination(hit.position);
+        }
     }
 
-    public void RadiusPatrol(Vector3 center)
+    public void ContinueMove(float speed)
     {
-        float firstX = Random.Range(center.x - lastTargetRadius, center.x + lastTargetRadius);
-        float firstZ = Random.Range(center.z - lastTargetRadius, center.z + lastTargetRadius);
-        float secondX = Random.Range(center.x - lastTargetRadius, center.x + lastTargetRadius);
-        float secondZ = Random.Range(center.z - lastTargetRadius, center.z + lastTargetRadius);
+        agent.speed = speed;
+    }
 
-        Apoint.transform.position = new Vector3(firstX, center.y, firstZ);
-        Bpoint.transform.position = new Vector3(secondX, center.y, secondZ);
-        Patrol();
+    public void StopEscape()
+    {
+        agent.ResetPath();
     }
 }
