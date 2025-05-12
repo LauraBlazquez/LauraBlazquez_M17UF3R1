@@ -5,21 +5,22 @@ using System.Collections.Generic;
 public class WeaponManager : MonoBehaviour
 {
     [SerializeField] private WeaponData defaultWeapon;
-    [SerializeField] private GenericPool magazinePool;
 
     public List<WeaponData> unlockedWeapons = new List<WeaponData>();
+    public WeaponDatabase weaponDatabase;
     public WeaponData currentWeapon;
     public bool hasPistol = true;
     private PlayerInput playerInput;
     public Player player;
+
+    private Dictionary<string, GenericPool> weaponPools = new Dictionary<string, GenericPool>();
 
     private void Start()
     {
         if (defaultWeapon != null)
         {
             unlockedWeapons.Add(defaultWeapon);
-            currentWeapon = defaultWeapon;
-            UpdateWeaponPool();
+            SetCurrentWeapon(defaultWeapon);
         }
     }
 
@@ -44,10 +45,7 @@ public class WeaponManager : MonoBehaviour
     {
         if (index < unlockedWeapons.Count)
         {
-            currentWeapon = unlockedWeapons[index];
-            UpdateWeaponVisual();
-            UpdateWeaponPool();
-            UpdateFireOrigin();
+            SetCurrentWeapon(unlockedWeapons[index]);
         }
         else
         {
@@ -55,52 +53,36 @@ public class WeaponManager : MonoBehaviour
         }
     }
 
-    private void UpdateWeaponVisual()
+    private void SetCurrentWeapon(WeaponData weapon)
     {
-        Animator animator = GetComponentInParent<Animator>();
-        if (hasPistol)
-        {
-            animator.SetBool("pistolEquiped", true);
-        }
-        else
-        {
-            animator.SetBool("pistolEquiped", false);
-        }
-    }
+        currentWeapon = weapon;
+        player.currentWeapon = currentWeapon;
+        player.fireOrigin = weapon.fireOrigin;
+        player.pool = weapon.pool;
+        if (weapon.name == "Pistol") hasPistol = true;
+        else hasPistol = false;
 
-    private void UpdateWeaponPool()
-    {
-        if (currentWeapon == null || currentWeapon.poolSO == null)
+        UpdateWeaponVisual();
+
+        if (weapon.pool != null)
         {
-            Debug.LogWarning("Faltan referencias para crear el pool.");
-        }
-        else
-        {
-            if (magazinePool == null)
+            if (!weaponPools.ContainsKey(weapon.name))
             {
-                Debug.Log("Esta arma no tiene pool");
+                weapon.pool.poolConfig = weapon.poolSO;
+                weapon.pool.InitializePool();
+                weaponPools.Add(weapon.name, weapon.pool);
             }
             else
             {
-                magazinePool.poolConfig = currentWeapon.poolSO;
-                if (GenericPool.Pools.ContainsKey(magazinePool.poolConfig.poolID))
-                {
-                    GenericPool.Pools.Remove(magazinePool.poolConfig.poolID);
-                }
-                foreach (Transform child in magazinePool.transform)
-                {
-                    Destroy(child.gameObject);
-                }
-                magazinePool.InitializePool();
-
-                Debug.Log($"Pool instanciada para: {currentWeapon.poolSO.poolID}");
+                Debug.Log("La pool ya está inicializada para esta arma.");
             }
         }
     }
 
-    private void UpdateFireOrigin()
+    private void UpdateWeaponVisual()
     {
-        player.fireOrigin = currentWeapon.fireOrigin;
+        Animator animator = GetComponentInParent<Animator>();
+        animator.SetBool("pistolEquiped", hasPistol);
     }
 
     public void UnlockWeapon(WeaponData newWeapon)
@@ -111,11 +93,25 @@ public class WeaponManager : MonoBehaviour
         }
     }
 
-    private void OnAttack(InputAction.CallbackContext context)
+    public void LoadInventory(List<string> weaponNames)
     {
-        if (currentWeapon != null)
+        unlockedWeapons.Clear();
+
+        foreach (string name in weaponNames)
         {
-            currentWeapon.UseWeapon(gameObject);
+            WeaponData weapon = weaponDatabase.allWeapons.Find(w => w.name == name);
+            if (weapon != null)
+            {
+                unlockedWeapons.Add(weapon);
+            }
+            else
+            {
+                Debug.LogWarning($"No se encontró el arma con nombre: {name}");
+            }
+        }
+        if (unlockedWeapons.Count > 0)
+        {
+            SetCurrentWeapon(unlockedWeapons[0]);
         }
     }
 }

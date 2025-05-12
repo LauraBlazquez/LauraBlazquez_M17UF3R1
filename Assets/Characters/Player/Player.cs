@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     public float jumpForce = 5f;
     public float fireRate = 1f;
     public GameObject fireOrigin;
+    public WeaponData currentWeapon;
     public GenericPool pool;
     private float fireCooldown;
     private PlayerControlls controls;
@@ -19,6 +20,19 @@ public class Player : MonoBehaviour
     private bool isRunning;
     public bool isGrounded;
     public Transform playerCamera;
+
+    private void Start()
+    {
+        var data = SaveSystem.Load();
+        if (data != null)
+        {
+            transform.position = new Vector3(data.position[0], data.position[1], data.position[2]);
+            transform.eulerAngles = new Vector3(data.rotation[0], data.rotation[1], data.rotation[2]);
+
+            var manager = GetComponentInChildren<WeaponManager>();
+            manager.LoadInventory(data.unlockedWeapons);
+        }
+    }
 
     private void Awake()
     {
@@ -78,6 +92,14 @@ public class Player : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (fireCooldown > 0)
+        {
+            fireCooldown -= Time.deltaTime;
+        }
+    }
+
     public void Jump()
     {
         if (isGrounded)
@@ -107,11 +129,19 @@ public class Player : MonoBehaviour
 
     public void Fire(Vector3 shootOrigin, Quaternion shootRotation)
     {
+        if (currentHealth <= 0) return;
+        if (fireCooldown > 0) return;
+
         GameObject bullet = pool.GetBullet();
-        animator.SetTrigger("Shoot");
         bullet.transform.position = shootOrigin;
-        bullet.transform.rotation = shootRotation;
-        bullet.SetActive(true);
+
+        Bullet bulletComponent = bullet.GetComponent<Bullet>();
+        if (bulletComponent != null)
+        {
+            Vector3 shootDirection = shootRotation * Vector3.forward;
+            bulletComponent.Fire(shootDirection, currentWeapon.damage, "Enemy", currentWeapon.poolSO.poolID, 20f, 2f);
+        }
+        animator.SetTrigger("Shoot");
         fireCooldown = 1f / fireRate;
     }
 }

@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8db29367a37115745aacebc64dfe20dc, type: 3}
-  m_Name: Pistol
+  m_Script: {fileID: 11500000, guid: 64d99ff546e08df4598471d870e3514d, type: 3}
+  m_Name: Weapon Database
   m_EditorClassIdentifier: 
-  poolID: Pistol
-  bulletPrefab: {fileID: 3642945597106451474, guid: ce3ee6afb8ed8b44793299f945508bbc, type: 3}
-  poolSize: 10
+  allWeapons:
+  - {fileID: 2563135150612836776, guid: 706c6127d7cf26c4ca22ee9018649d8a, type: 3}
+  - {fileID: 4722829182374516867, guid: c356cb3392946414aba93aeb515f8a3a, type: 3}

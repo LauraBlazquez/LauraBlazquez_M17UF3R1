@@ -49,7 +49,8 @@ public class GenericPool : MonoBehaviour
         }
         else
         {
-            GameObject bullet = Instantiate(poolConfig.bulletPrefab, transform);
+            GameObject bullet = Instantiate(poolConfig.bulletPrefab);
+            bullet.transform.SetParent(GameObject.Find("Sniper").transform);
             return bullet;
         }
     }

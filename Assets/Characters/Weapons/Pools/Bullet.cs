@@ -7,7 +7,7 @@ public class Bullet : MonoBehaviour
     [HideInInspector] public float damage;
     private Vector3 direction;
     private Coroutine lifeCoroutine;
-    [HideInInspector] public float lifetime = 2f;
+    [HideInInspector] public float lifetime = 5f;
     [HideInInspector] public string targetTag;
     [HideInInspector] public string poolID;
 
@@ -39,7 +39,7 @@ public class Bullet : MonoBehaviour
         ReturnToPool();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter(Collider collision)
     {
         if (collision.CompareTag(targetTag))
         {
